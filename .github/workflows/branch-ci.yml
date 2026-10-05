@@ -20,7 +20,7 @@ on:
 
 jobs:
   build:
-    name: Build AAPS
+    name: Build OAPS
     runs-on: ubuntu-latest
     steps:
       - name: Decode Secrets Keystore Set and Oauth2 to Env
@@ -207,29 +207,29 @@ jobs:
 
       - name: Rename APKs with version
         run: |
-          mv app/build/outputs/apk/${{ env.VARIANT_FLAVOR }}/${{ env.VARIANT_TYPE }}/*.apk aaps-${{ env.VERSION }}${{ env.VERSION_SUFFIX }}.apk
-          mv wear/build/outputs/apk/${{ env.VARIANT_FLAVOR }}/${{ env.VARIANT_TYPE }}/*.apk aaps-wear-${{ env.VERSION }}${{ env.VERSION_SUFFIX }}.apk
+          mv app/build/outputs/apk/${{ env.VARIANT_FLAVOR }}/${{ env.VARIANT_TYPE }}/*.apk oaps-${{ env.VERSION }}${{ env.VERSION_SUFFIX }}.apk
+          mv wear/build/outputs/apk/${{ env.VARIANT_FLAVOR }}/${{ env.VARIANT_TYPE }}/*.apk oaps-wear-${{ env.VERSION }}${{ env.VERSION_SUFFIX }}.apk
 
       - name: Upload APKs to Google Drive
         run: |
           set -e
           echo "🔐 Start uploading APKs to Google Drive..."
 
-          echo "📁 Checking or creating AAPS folder"
+          echo "📁 Checking or creating OAPS folder"
           AAPS_FOLDER_ID=$(curl -s -X GET \
             -H "Authorization: Bearer $ACCESS_TOKEN" \
-            "https://www.googleapis.com/drive/v3/files?q=name='AAPS'+and+mimeType='application/vnd.google-apps.folder'+and+trashed=false" \
+            "https://www.googleapis.com/drive/v3/files?q=name='OAPS'+and+mimeType='application/vnd.google-apps.folder'+and+trashed=false" \
             | jq -r '.files[0].id')
 
           if [ "$AAPS_FOLDER_ID" == "null" ] || [ -z "$AAPS_FOLDER_ID" ]; then
             AAPS_FOLDER_ID=$(curl -s -X POST \
               -H "Authorization: Bearer $ACCESS_TOKEN" \
               -H "Content-Type: application/json" \
-              -d '{"name": "AAPS", "mimeType": "application/vnd.google-apps.folder"}' \
+              -d '{"name": "OAPS", "mimeType": "application/vnd.google-apps.folder"}' \
               "https://www.googleapis.com/drive/v3/files" | jq -r '.id')
-            echo "📂 Created AAPS folder: $AAPS_FOLDER_ID"
+            echo "📂 Created OAPS folder: $AAPS_FOLDER_ID"
           else
-            echo "📂 Found AAPS folder: $AAPS_FOLDER_ID"
+            echo "📂 Found OAPS folder: $AAPS_FOLDER_ID"
           fi
 
           echo "📁 Checking or creating version folder: $VERSION"
@@ -290,8 +290,8 @@ jobs:
             echo "✅ Uploaded: $NAME"
           }
 
-          upload_to_gdrive "aaps-${VERSION}${VERSION_SUFFIX}.apk" "aaps-${VERSION}${VERSION_SUFFIX}.apk"
-          upload_to_gdrive "aaps-wear-${VERSION}${VERSION_SUFFIX}.apk" "aaps-wear-${VERSION}${VERSION_SUFFIX}.apk"
+          upload_to_gdrive "oaps-${VERSION}${VERSION_SUFFIX}.apk" "oaps-${VERSION}${VERSION_SUFFIX}.apk"
+          upload_to_gdrive "oaps-wear-${VERSION}${VERSION_SUFFIX}.apk" "oaps-wear-${VERSION}${VERSION_SUFFIX}.apk"
 
           echo "🎉 APKs successfully uploaded to Google Drive!"
 
