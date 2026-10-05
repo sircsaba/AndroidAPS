@@ -63,9 +63,9 @@ android {
     productFlavors {
         create("full") {
             isDefault = true
-            applicationId = "info.nightscout.androidaps"
+            applicationId = "info.nightscout.oaps"   // OAPS: separate app, installs next to AAPS
             dimension = "standard"
-            resValue("string", "app_name", "AAPS")
+            resValue("string", "app_name", "OAPS")
             versionName = Versions.appVersion
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
         }
