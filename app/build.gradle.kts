@@ -107,8 +107,8 @@ android {
             dimension = "standard"
             resValue("string", "app_name", "OAPS")
             versionName = Versions.appVersion
-            manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
-            manifestPlaceholders["appIconRound"] = "@mipmap/ic_launcher_round"
+            manifestPlaceholders["appIcon"] = "@mipmap/ic_oaps"           // OAPS icon
+            manifestPlaceholders["appIconRound"] = "@mipmap/ic_oaps_round"
         }
         create("pumpcontrol") {
             applicationId = "info.nightscout.aapspumpcontrol"

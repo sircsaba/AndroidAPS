@@ -18,6 +18,7 @@ It differs from upstream in three ways:
    name "OAPS" (phone and watch), so it installs next to a normal AAPS instead
    of replacing it. It starts with its own empty settings and history.
    Never let AAPS and OAPS loop the same pump at the same time.
+   It has its own orange launcher icon (`ic_oaps`, phone and watch).
 
 Unit tests for both plugins and `ConstraintsCheckerImplTest` were updated to match.
 
