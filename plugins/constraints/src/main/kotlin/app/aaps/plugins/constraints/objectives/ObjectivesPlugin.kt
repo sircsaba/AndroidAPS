@@ -4,12 +4,6 @@ import app.aaps.core.data.plugin.PluginType
 import app.aaps.core.interfaces.configuration.Config
 import app.aaps.core.interfaces.constraints.Constraint
 import app.aaps.core.interfaces.constraints.Objectives
-import app.aaps.core.interfaces.constraints.Objectives.Companion.AUTOSENS_OBJECTIVE
-import app.aaps.core.interfaces.constraints.Objectives.Companion.AUTO_OBJECTIVE
-import app.aaps.core.interfaces.constraints.Objectives.Companion.CLOSED_LOOP_OBJECTIVE
-import app.aaps.core.interfaces.constraints.Objectives.Companion.FIRST_OBJECTIVE
-import app.aaps.core.interfaces.constraints.Objectives.Companion.LGS_OBJECTIVE
-import app.aaps.core.interfaces.constraints.Objectives.Companion.SMB_OBJECTIVE
 import app.aaps.core.interfaces.constraints.PluginConstraints
 import app.aaps.core.interfaces.logging.AAPSLogger
 import app.aaps.core.interfaces.plugin.PluginBaseWithPreferences
@@ -35,6 +29,8 @@ class ObjectivesPlugin @Inject constructor(
 ) : PluginBaseWithPreferences(
     pluginDescription = PluginDescription()
         .mainType(PluginType.CONSTRAINTS)
+        .neverVisible(true)       // OAPS: hide the Objectives tab
+        .showInList { false }     // OAPS: hide it from Config Builder too
         .fragmentClass(ObjectivesFragment::class.qualifiedName)
         .pluginIcon(app.aaps.core.ui.R.drawable.ic_graduation)
         .pluginName(app.aaps.core.ui.R.string.objectives)
@@ -72,55 +68,20 @@ class ObjectivesPlugin @Inject constructor(
 
     /**
      * Constraints interface
+     *
+     * OAPS: objectives are removed. None of these gates restrict anything any more:
+     * loop, closed loop, autosens, SMB and automation are available immediately,
+     * and LGS mode is never forced by an unfinished objective.
      */
-    override fun isLoopInvocationAllowed(value: Constraint<Boolean>): Constraint<Boolean> {
-        // Check if initialized
-        if (objectives.isEmpty()) return value
-        if (!objectives[FIRST_OBJECTIVE].isStarted)
-            value.set(false, rh.gs(R.string.objectivenotstarted, FIRST_OBJECTIVE + 1), this)
-        return value
-    }
+    override fun isLoopInvocationAllowed(value: Constraint<Boolean>): Constraint<Boolean> = value
+    override fun isLgsForced(value: Constraint<Boolean>): Constraint<Boolean> = value
+    override fun isClosedLoopAllowed(value: Constraint<Boolean>): Constraint<Boolean> = value
+    override fun isAutosensModeEnabled(value: Constraint<Boolean>): Constraint<Boolean> = value
+    override fun isSMBModeEnabled(value: Constraint<Boolean>): Constraint<Boolean> = value
+    override fun isAutomationEnabled(value: Constraint<Boolean>): Constraint<Boolean> = value
 
-    override fun isLgsForced(value: Constraint<Boolean>): Constraint<Boolean> {
-        // Check if initialized
-        if (objectives.isEmpty()) return value
-        if (objectives[LGS_OBJECTIVE].isStarted && !objectives[LGS_OBJECTIVE].isAccomplished)
-            value.set(true, rh.gs(R.string.objectivenotfinished, LGS_OBJECTIVE + 1), this)
-        return value
-    }
-
-    override fun isClosedLoopAllowed(value: Constraint<Boolean>): Constraint<Boolean> {
-        // Check if initialized
-        if (objectives.isEmpty()) return value
-        if (!objectives[CLOSED_LOOP_OBJECTIVE].isStarted)
-            value.set(false, rh.gs(R.string.objectivenotstarted, CLOSED_LOOP_OBJECTIVE + 1), this)
-        return value
-    }
-
-    override fun isAutosensModeEnabled(value: Constraint<Boolean>): Constraint<Boolean> {
-        // Check if initialized
-        if (objectives.isEmpty()) return value
-        if (!objectives[AUTOSENS_OBJECTIVE].isStarted)
-            value.set(false, rh.gs(R.string.objectivenotstarted, AUTOSENS_OBJECTIVE + 1), this)
-        return value
-    }
-
-    override fun isSMBModeEnabled(value: Constraint<Boolean>): Constraint<Boolean> {
-        // Check if initialized
-        if (objectives.isEmpty()) return value
-        if (!objectives[SMB_OBJECTIVE].isStarted)
-            value.set(false, rh.gs(R.string.objectivenotstarted, SMB_OBJECTIVE + 1), this)
-        return value
-    }
-
-    override fun isAutomationEnabled(value: Constraint<Boolean>): Constraint<Boolean> {
-        // Check if initialized
-        if (objectives.isEmpty()) return value
-        if (!objectives[AUTO_OBJECTIVE].isStarted)
-            value.set(false, rh.gs(R.string.objectivenotstarted, AUTO_OBJECTIVE + 1), this)
-        return value
-    }
-
-    override fun isAccomplished(index: Int) = objectives[index].isAccomplished
-    override fun isStarted(index: Int): Boolean = objectives[index].isStarted
+    // Report every objective as started and accomplished so nothing else waits on them
+    // (e.g. the setup wizard's objectives step is skipped).
+    override fun isAccomplished(index: Int) = true
+    override fun isStarted(index: Int): Boolean = true
 }
