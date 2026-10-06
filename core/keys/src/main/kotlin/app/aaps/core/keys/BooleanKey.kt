@@ -46,7 +46,8 @@ enum class BooleanKey(
 
     ApsUseDynamicSensitivity("use_dynamic_sensitivity", false),
     ApsUseAutosens("openapsama_useautosens", true, defaultedBySM = true, negativeDependency = ApsUseDynamicSensitivity), // change from default false
-    ApsUseSmb("use_smb", true, defaultedBySM = true), // change from default false
+    // OAPS 2026-10-06: SMB off on a fresh install and user-controlled even in simple mode (was: true, defaultedBySM)
+    ApsUseSmb("use_smb", false),
     ApsUseSmbWithHighTt("enableSMB_with_high_temptarget", false, defaultedBySM = true, dependency = ApsUseSmb),
     ApsUseSmbAlways("enableSMB_always", true, defaultedBySM = true, dependency = ApsUseSmb), // change from default false
     ApsUseSmbWithCob("enableSMB_with_COB", true, defaultedBySM = true, dependency = ApsUseSmb), // change from default false

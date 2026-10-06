@@ -27,8 +27,10 @@ enum class DoubleKey(
     ActionsFillButton3("fill_button3", 0.0, 0.05, 20.0, defaultedBySM = true),
     SafetyMaxBolus("treatmentssafety_maxbolus", 3.0, 0.1, 60.0),
     ApsMaxBasal("openapsma_max_basal", 1.0, 0.1, 25.0, defaultedBySM = true, calculatedBySM = true),
-    ApsSmbMaxIob("openapsmb_max_iob", 3.0, 0.0, 70.0, defaultedBySM = true, calculatedBySM = true),
-    ApsAmaMaxIob("openapsma_max_iob", 1.5, 0.0, 25.0, defaultedBySM = true, calculatedBySM = true),
+    // OAPS 2026-10-06: max IOB starts at 0 and is only what the user sets, also in simple mode (was: 3.0, auto-calculated in simple mode)
+    ApsSmbMaxIob("openapsmb_max_iob", 0.0, 0.0, 70.0),
+    // OAPS 2026-10-06: max IOB starts at 0 and is only what the user sets, also in simple mode (was: 1.5, auto-calculated in simple mode)
+    ApsAmaMaxIob("openapsma_max_iob", 0.0, 0.0, 25.0),
     ApsMaxDailyMultiplier("openapsama_max_daily_safety_multiplier", 3.0, 1.0, 10.0, defaultedBySM = true),
     ApsMaxCurrentBasalMultiplier("openapsama_current_basal_safety_multiplier", 4.0, 1.0, 10.0, defaultedBySM = true),
     ApsAmaBolusSnoozeDivisor("bolussnooze_dia_divisor", 2.0, 1.0, 10.0, defaultedBySM = true),
