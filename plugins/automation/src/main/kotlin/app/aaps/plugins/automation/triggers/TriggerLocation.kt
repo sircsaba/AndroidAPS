@@ -3,7 +3,6 @@ package app.aaps.plugins.automation.triggers
 import android.content.Context
 import android.location.Location
 import android.widget.LinearLayout
-import app.aaps.core.data.firebase.RemoteConfigKeys
 import app.aaps.core.interfaces.logging.LTag
 import app.aaps.core.ui.toast.ToastUtils
 import app.aaps.core.utils.JsonHelper
@@ -17,8 +16,6 @@ import app.aaps.plugins.automation.elements.LayoutBuilder
 import app.aaps.plugins.automation.elements.StaticLabel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
-import com.google.firebase.Firebase
-import com.google.firebase.remoteconfig.remoteConfig
 import com.rtchagas.pingplacepicker.PingPlacePicker
 import dagger.android.HasAndroidInjector
 import org.json.JSONObject
@@ -48,7 +45,7 @@ class TriggerLocation(injector: HasAndroidInjector) : Trigger(injector), PingPla
         val builder = PingPlacePicker.Builder()
         builder
             .setAndroidApiKey(rh.gs(R.string.key_google_apis_android))
-            .setMapsApiKey(Firebase.remoteConfig.getString(RemoteConfigKeys.KEY_MAPS_API))
+            .setMapsApiKey("") // OAPS 2026-10-06: key came from Firebase Remote Config, which is removed
             .setOnPlaceSelectedListener(this)
 
         // Set a initial location.

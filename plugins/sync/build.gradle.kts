@@ -49,6 +49,9 @@ dependencies {
 
     // DataLayerListenerService
     api(libs.com.google.android.gms.playservices.wearable)
+    // OAPS 2026-10-06: previously came in through Firebase, now declared directly
+    api(platform(libs.kotlinx.coroutines.bom))
+    api(libs.kotlinx.coroutines.play.services)
 
     // Garmin
     api(libs.com.garmin.connectiq) { artifact { type = "aar" } }

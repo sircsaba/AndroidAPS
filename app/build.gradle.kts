@@ -6,8 +6,6 @@ plugins {
     alias(libs.plugins.ksp)
     id("com.android.application")
     id("kotlin-android")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
     id("android-app-dependencies")
     id("test-app-dependencies")
     id("jacoco-app-dependencies")
@@ -217,7 +215,6 @@ dependencies {
     // MainApp
     api(libs.com.uber.rxdogtag2.rxdogtag)
     // Remote config
-    api(libs.com.google.firebase.config)
 }
 
 println("-------------------")

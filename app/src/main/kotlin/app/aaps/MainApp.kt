@@ -41,7 +41,6 @@ import app.aaps.core.keys.UnitDoubleKey
 import app.aaps.core.keys.interfaces.Preferences
 import app.aaps.core.ui.extensions.runOnUiThread
 import app.aaps.core.ui.locale.LocaleHelper
-import app.aaps.core.utils.JsonHelper
 import app.aaps.database.persistence.CompatDBHelper
 import app.aaps.di.AppComponent
 import app.aaps.di.DaggerAppComponent
@@ -61,10 +60,6 @@ import app.aaps.receivers.TimeDateOrTZChangeReceiver
 import app.aaps.ui.activityMonitor.ActivityMonitor
 import app.aaps.ui.widget.Widget
 import app.aaps.utils.configureLeakCanary
-import com.google.firebase.Firebase
-import com.google.firebase.FirebaseApp
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
-import com.google.firebase.remoteconfig.remoteConfig
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -75,13 +70,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import rxdogtag2.RxDogTag
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Provider
-import kotlin.reflect.KMutableProperty
-import kotlin.reflect.full.declaredMemberProperties
 
 class MainApp : DaggerApplication() {
 
@@ -120,7 +112,7 @@ class MainApp : DaggerApplication() {
         aapsLogger.debug("onCreate")
         ProcessLifecycleOwner.get().lifecycle.addObserver(processLifecycleListener.get())
         // Configure LeakCanary with Firebase reporting
-        // Memory leaks will be uploaded to Firebase Crashlytics via FabricPrivacy.logException
+        // Memory leaks are written to the local log via FabricPrivacy.logException (OAPS: no Firebase)
         configureLeakCanary(
             isEnabled = !config.disableLeakCanary(),
             fabricPrivacy = fabricPrivacy
@@ -157,7 +149,7 @@ class MainApp : DaggerApplication() {
         aapsLogger.debug("Remote: " + config.REMOTE)
         aapsLogger.debug("Phone: " + Build.MANUFACTURER + " " + Build.MODEL)
         registerLocalBroadcastReceiver()
-        setupRemoteConfig()
+        // OAPS 2026-10-06: Firebase Remote Config removed (bundled version definitions are used)
 
         // trigger here to see the new version on app start after an update
         handler.postDelayed({ versionCheckersUtils.triggerCheckVersion() }, 30000)
@@ -443,32 +435,6 @@ class MainApp : DaggerApplication() {
         unregisterReceiver(networkReceiver)
         unregisterReceiver(chargingReceiver)
         unregisterReceiver(btReceiver)
-    }
-
-    private fun setupRemoteConfig() {
-        FirebaseApp.initializeApp(this)
-        Firebase.remoteConfig.also { firebaseRemoteConfig ->
-
-            firebaseRemoteConfig.setConfigSettingsAsync(
-                FirebaseRemoteConfigSettings
-                    .Builder()
-                    .setMinimumFetchIntervalInSeconds(3600)
-                    .build()
-            )
-            firebaseRemoteConfig
-                .fetchAndActivate()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        aapsLogger.debug("RemoteConfig received successfully")
-                        @Suppress("UNCHECKED_CAST")
-                        (versionCheckersUtils::class.declaredMemberProperties.find { it.name == "definition" } as KMutableProperty<Any>?)
-                            ?.let {
-                                val merged = JsonHelper.merge(it.getter.call(versionCheckersUtils) as JSONObject, JSONObject(firebaseRemoteConfig.getString("defs")))
-                                it.setter.call(versionCheckersUtils, merged)
-                            }
-                    } else aapsLogger.error("RemoteConfig fetch failed")
-                }
-        }
     }
 
     override fun onTerminate() {

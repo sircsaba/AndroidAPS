@@ -1,13 +1,12 @@
 package app.aaps.core.utils.fabric
 
-import com.google.firebase.installations.FirebaseInstallations
+import java.util.UUID
 
+/**
+ * OAPS 2026-10-06: Firebase Installations removed.
+ * A random ID is generated locally each time the app starts; it is never sent anywhere.
+ */
 object InstanceId {
-    var instanceId : String = ""
 
-    init {
-        FirebaseInstallations.getInstance().id.addOnCompleteListener {
-            instanceId = it.result
-        }
-    }
+    var instanceId: String = UUID.randomUUID().toString()
 }

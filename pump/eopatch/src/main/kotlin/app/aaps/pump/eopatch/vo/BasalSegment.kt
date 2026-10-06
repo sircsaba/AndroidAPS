@@ -1,7 +1,7 @@
 package app.aaps.pump.eopatch.vo
 
 import app.aaps.pump.eopatch.AppConstant
-import com.google.android.gms.common.internal.Preconditions
+import com.google.common.base.Preconditions // OAPS: was play-services (came via Firebase)
 
 data class BasalSegment(var start: Long, var end: Long, var doseUnitPerHour: Float) : SegmentEntity<BasalSegment>() {
 

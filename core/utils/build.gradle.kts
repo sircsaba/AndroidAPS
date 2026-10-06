@@ -22,9 +22,6 @@ dependencies {
     api(libs.net.danlew.android.joda)
 
     //Firebase
-    api(platform(libs.com.google.firebase.bom))
-    api(libs.com.google.firebase.analytics)
-    api(libs.com.google.firebase.crashlytics)
     // StatsActivity not in use now
     // api(libs.com.google.firebase.messaging)
     // api(libs.com.google.firebase.auth)
